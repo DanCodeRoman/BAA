@@ -460,6 +460,10 @@
             display: none;
         }
         
+        .fullscreen-mode {
+            background-color: white;
+        }
+        
         @media print {
             body {
                 background-color: white;
@@ -470,7 +474,6 @@
                 transform: translateY(0);
                 height: auto;
                 min-height: 80vh;
-                page-break-after: always;
                 transition: none;
             }
             
@@ -507,7 +510,6 @@
                 <h1 class="text-5xl font-bold mb-4">Buckeyes Against <span class="buckeye-accent">Alzheimer's</span></h1>
                 <p class="text-xl mb-8">Fighting for a future without Alzheimer's disease</p>
                 <p class="text-gray-500 mt-8">The Ohio State University</p>
-                <p class="text-gray-400 mt-2">15-Minute Presentation</p>
             </div>
         </section>
 
@@ -517,9 +519,25 @@
                 <h2 class="text-3xl font-bold mb-6">Understanding <span class="buckeye-accent">Alzheimer's Disease</span></h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <p class="mb-4">Alzheimer's disease is a progressive neurological disorder that causes brain cells to die and the brain to shrink (atrophy). It is the most common cause of dementia — a continuous decline in thinking, behavioral and social skills that affects a person's ability to function independently.</p>
-                        <p class="mb-4">The early signs of the disease include forgetting recent events or conversations. As the disease progresses, a person with Alzheimer's disease will develop severe memory impairment and lose the ability to carry out everyday tasks.</p>
-                        <p>Medications may temporarily improve or slow progression of symptoms. These treatments can sometimes help people with Alzheimer's disease maximize function and maintain independence for a time.</p>
+                        <div class="list-item">
+                            <strong>Progressive neurological disorder</strong> that causes brain cells to die and the brain to shrink (atrophy)
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Most common cause of dementia</strong> — a continuous decline in thinking, behavioral and social skills
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Early signs</strong> include forgetting recent events or conversations
+                        </div>
+                        
+                        <div class="list-item">
+                            As the disease progresses, patients develop <strong>severe memory impairment</strong> and lose ability to carry out everyday tasks
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Treatments</strong> may temporarily improve symptoms but there is currently no cure
+                        </div>
                     </div>
                     <div class="image-container">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Alzheimer%27s_disease_brain_comparison.jpg/1024px-Alzheimer%27s_disease_brain_comparison.jpg" alt="Healthy Brain vs Alzheimer's Brain" class="w-full rounded">
@@ -537,7 +555,7 @@
                 
                 <div class="stat-box">
                     <h3 class="text-xl font-semibold mb-2">Prevalence</h3>
-                    <p class="text-lg">An estimated <strong>6.9 million Americans</strong> age 65 and older are living with Alzheimer's in 2024. This number could grow to <strong>13.8 million by 2060</strong> without medical breakthroughs.</p>
+                    <p class="text-lg">An estimated <strong>6.9 million Americans</strong> age 65 and older are living with Alzheimer's in 2025. This number could grow to <strong>13.8 million by 2060</strong> without medical breakthroughs.</p>
                 </div>
                 
                 <div class="stat-box">
@@ -1034,7 +1052,7 @@
                     <div class="flex flex-wrap justify-center gap-6">
                         <div class="flex items-center">
                             <i class="fas fa-envelope text-red-700 mr-2"></i>
-                            <span>Email: buckeyesagainstalzheimers@osu.edu</span>
+                            <span>Email: baa@osu.edu</span>
                         </div>
                         <div class="flex items-center">
                             <i class="fab fa-instagram text-red-700 mr-2"></i>
@@ -1097,8 +1115,7 @@
                 </div>
                 
                 <div class="mt-10">
-                    <p class="text-gray-500">Contact: buckeyesagainstalzheimers@osu.edu</p>
-                    <p class="text-gray-400 mt-2">© 2025 Buckeyes Against Alzheimer's</p>
+                    <p class="text-gray-500">Contact: baa@osu.edu</p>
                 </div>
             </div>
         </section>
@@ -1131,6 +1148,7 @@
             
             let currentSlide = 0;
             let isPresenting = false;
+            let inFullscreen = false;
             let presentationInterval;
             
             function showSlide(index) {
@@ -1158,17 +1176,49 @@
                 showSlide(currentSlide - 1);
             }
             
+            // Function to enter fullscreen
+            function enterFullscreen(element) {
+                if(element.requestFullscreen) {
+                    element.requestFullscreen();
+                } else if(element.mozRequestFullScreen) {
+                    element.mozRequestFullScreen();
+                } else if(element.webkitRequestFullscreen) {
+                    element.webkitRequestFullscreen();
+                } else if(element.msRequestFullscreen) {
+                    element.msRequestFullscreen();
+                }
+                inFullscreen = true;
+            }
+            
+            // Function to exit fullscreen
+            function exitFullscreen() {
+                if(document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if(document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if(document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if(document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+                inFullscreen = false;
+            }
+            
             function togglePresentation() {
                 isPresenting = !isPresenting;
                 
                 if (isPresenting) {
                     document.body.classList.add('present-mode');
                     presentBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
-                    presentationInterval = setInterval(nextSlide, 10000); // Change slide every 10 seconds
+                    // Enter fullscreen when presenting
+                    enterFullscreen(document.documentElement);
                 } else {
                     document.body.classList.remove('present-mode');
                     presentBtn.innerHTML = '<i class="fas fa-play"></i> Present';
-                    clearInterval(presentationInterval);
+                    // Exit fullscreen when stopping presentation
+                    if (inFullscreen) {
+                        exitFullscreen();
+                    }
                 }
             }
             
@@ -1190,16 +1240,10 @@
             }
             
             prevBtn.addEventListener('click', function() {
-                if (isPresenting) {
-                    togglePresentation();
-                }
                 prevSlide();
             });
             
             nextBtn.addEventListener('click', function() {
-                if (isPresenting) {
-                    togglePresentation();
-                }
                 nextSlide();
             });
             
@@ -1208,11 +1252,19 @@
             
             // Keyboard navigation
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'ArrowRight' || e.key === 'Space') {
+                if (e.key === 'ArrowRight') {
                     nextSlide();
                 } else if (e.key === 'ArrowLeft') {
                     prevSlide();
                 } else if (e.key === 'p' || e.key === 'P') {
+                    togglePresentation();
+                }
+            });
+            
+            // Handle fullscreen change
+            document.addEventListener('fullscreenchange', function() {
+                if (!document.fullscreenElement && isPresenting) {
+                    // If user exits fullscreen while presenting, stop presentation
                     togglePresentation();
                 }
             });
