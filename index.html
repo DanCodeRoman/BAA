@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buckeyes Against Alzheimer's</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --osu-scarlet: #bb0000;
+            --osu-gray: #666666;
+            --osu-white: #ffffff;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #f5f5f5;
+        }
+        
+        .slide {
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            box-sizing: border-box;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+        }
+        
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .slide-content {
+            max-width: 1200px;
+            width: 100%;
+            background-color: white;
+            border-radius: 12px;
+            padding: 3rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .slide-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--osu-scarlet);
+        }
+        
+        .title-slide {
+            background-color: #f8f8f8;
+            position: relative;
+        }
+        
+        .title-slide::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30%;
+            background: linear-gradient(to bottom, transparent, rgba(187, 0, 0, 0.05));
+            z-index: 0;
+        }
+        
+        .buckeye-accent {
+            color: var(--osu-scarlet);
+        }
+        
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn {
+            background-color: white;
+            color: var(--osu-gray);
+            border: 2px solid var(--osu-gray);
+            border-radius: 30px;
+            padding: 8px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            outline: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background-color: var(--osu-scarlet);
+            color: white;
+            border-color: var(--osu-scarlet);
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .present-btn {
+            background-color: var(--osu-scarlet);
+            color: white;
+            border-color: var(--osu-scarlet);
+        }
+        
+        .present-mode .control-panel {
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+        
+        .present-mode .control-panel:hover {
+            opacity: 1;
+        }
+        
+        .stat-box {
+            background-color: #f8f8f8;
+            border-left: 4px solid var(--osu-scarlet);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transform: translateX(20px);
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+        
+        .active .stat-box {
+            transform: translateX(0);
+            opacity: 1;
+            transition-delay: 0.3s;
+        }
+        
+        .active .stat-box:nth-child(2) {
+            transition-delay: 0.5s;
+        }
+        
+        .active .stat-box:nth-child(3) {
+            transition-delay: 0.7s;
+        }
+        
+        .image-container {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            transform: scale(0.95);
+            opacity: 0;
+            transition: transform 0.6s ease, opacity 0.6s ease;
+        }
+        
+        .active .image-container {
+            transform: scale(1);
+            opacity: 1;
+            transition-delay: 0.3s;
+        }
+        
+        .list-item {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .list-item::before {
+            content: '•';
+            color: var(--osu-scarlet);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .active .list-item {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .active .list-item:nth-child(1) {
+            transition-delay: 0.2s;
+        }
+        
+        .active .list-item:nth-child(2) {
+            transition-delay: 0.4s;
+        }
+        
+        .active .list-item:nth-child(3) {
+            transition-delay: 0.6s;
+        }
+        
+        .active .list-item:nth-child(4) {
+            transition-delay: 0.8s;
+        }
+        
+        .active .list-item:nth-child(5) {
+            transition-delay: 1s;
+        }
+        
+        .stages-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .stage {
+            flex: 1;
+            min-width: 250px;
+            margin: 1rem;
+            padding: 1.5rem;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .active .stage {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .active .stage:nth-child(1) {
+            transition-delay: 0.2s;
+        }
+        
+        .active .stage:nth-child(2) {
+            transition-delay: 0.4s;
+        }
+        
+        .active .stage:nth-child(3) {
+            transition-delay: 0.6s;
+        }
+        
+        .treatment-box {
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--osu-scarlet);
+            opacity: 0;
+            transform: translateX(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .active .treatment-box {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .active .treatment-box:nth-child(1) {
+            transition-delay: 0.2s;
+        }
+        
+        .active .treatment-box:nth-child(2) {
+            transition-delay: 0.4s;
+        }
+        
+        .active .treatment-box:nth-child(3) {
+            transition-delay: 0.6s;
+        }
+        
+        .mission-statement {
+            font-style: italic;
+            position: relative;
+            padding: 2rem;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            margin: 2rem 0;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        
+        .mission-statement::before,
+        .mission-statement::after {
+            content: '"';
+            font-size: 4rem;
+            color: var(--osu-scarlet);
+            opacity: 0.2;
+            position: absolute;
+        }
+        
+        .mission-statement::before {
+            top: -10px;
+            left: 10px;
+        }
+        
+        .mission-statement::after {
+            bottom: -40px;
+            right: 10px;
+        }
+        
+        .active .mission-statement {
+            opacity: 1;
+            transform: scale(1);
+            transition-delay: 0.3s;
+        }
+        
+        .prevention-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .prevention-icon {
+            font-size: 2rem;
+            color: var(--osu-scarlet);
+            margin-right: 1.5rem;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .active .prevention-item {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .active .prevention-item:nth-child(1) {
+            transition-delay: 0.2s;
+        }
+        
+        .active .prevention-item:nth-child(2) {
+            transition-delay: 0.4s;
+        }
+        
+        .active .prevention-item:nth-child(3) {
+            transition-delay: 0.6s;
+        }
+        
+        .active .prevention-item:nth-child(4) {
+            transition-delay: 0.8s;
+        }
+        
+        .active .prevention-item:nth-child(5) {
+            transition-delay: 1s;
+        }
+        
+        .resource-card {
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--osu-scarlet);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .active .resource-card {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .active .resource-card:nth-child(1) {
+            transition-delay: 0.2s;
+        }
+        
+        .active .resource-card:nth-child(2) {
+            transition-delay: 0.4s;
+        }
+        
+        .active .resource-card:nth-child(3) {
+            transition-delay: 0.6s;
+        }
+        
+        .caregiver-impact {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        
+        .impact-item {
+            flex: 1;
+            min-width: 200px;
+            background-color: #f8f8f8;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .active .impact-item {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .active .impact-item:nth-child(1) {
+            transition-delay: 0.2s;
+        }
+        
+        .active .impact-item:nth-child(2) {
+            transition-delay: 0.4s;
+        }
+        
+        .active .impact-item:nth-child(3) {
+            transition-delay: 0.6s;
+        }
+        
+        .pdf-display .slide {
+            opacity: 1;
+            transform: translateY(0);
+            height: auto;
+            min-height: 80vh;
+            transition: none;
+            margin-bottom: 3rem;
+        }
+        
+        .pdf-display .stat-box,
+        .pdf-display .image-container,
+        .pdf-display .list-item,
+        .pdf-display .stage,
+        .pdf-display .treatment-box,
+        .pdf-display .mission-statement,
+        .pdf-display .prevention-item,
+        .pdf-display .resource-card,
+        .pdf-display .impact-item {
+            opacity: 1;
+            transform: none;
+            transition: none;
+        }
+        
+        .pdf-display .control-panel {
+            display: none;
+        }
+        
+        @media print {
+            body {
+                background-color: white;
+            }
+            
+            .slide {
+                opacity: 1;
+                transform: translateY(0);
+                height: auto;
+                min-height: 80vh;
+                page-break-after: always;
+                transition: none;
+            }
+            
+            .control-panel {
+                display: none;
+            }
+            
+            .slide-content {
+                box-shadow: none;
+            }
+            
+            .stat-box,
+            .image-container,
+            .list-item,
+            .stage,
+            .treatment-box,
+            .mission-statement,
+            .prevention-item,
+            .resource-card,
+            .impact-item {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="presentation-container">
+        <!-- Slide 1: Title Slide -->
+        <section id="slide-1" class="slide title-slide active">
+            <div class="slide-content text-center">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Ohio_State_Buckeyes_logo.svg/2082px-Ohio_State_Buckeyes_logo.svg.png" alt="OSU Buckeyes Logo" class="h-32 mx-auto mb-8">
+                <h1 class="text-5xl font-bold mb-4">Buckeyes Against <span class="buckeye-accent">Alzheimer's</span></h1>
+                <p class="text-xl mb-8">Fighting for a future without Alzheimer's disease</p>
+                <p class="text-gray-500 mt-8">The Ohio State University</p>
+                <p class="text-gray-400 mt-2">15-Minute Presentation</p>
+            </div>
+        </section>
+
+        <!-- Slide 2: Introduction -->
+        <section id="slide-2" class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl font-bold mb-6">Understanding <span class="buckeye-accent">Alzheimer's Disease</span></h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="mb-4">Alzheimer's disease is a progressive neurological disorder that causes brain cells to die and the brain to shrink (atrophy). It is the most common cause of dementia — a continuous decline in thinking, behavioral and social skills that affects a person's ability to function independently.</p>
+                        <p class="mb-4">The early signs of the disease include forgetting recent events or conversations. As the disease progresses, a person with Alzheimer's disease will develop severe memory impairment and lose the ability to carry out everyday tasks.</p>
+                        <p>Medications may temporarily improve or slow progression of symptoms. These treatments can sometimes help people with Alzheimer's disease maximize function and maintain independence for a time.</p>
+                    </div>
+                    <div class="image-container">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Alzheimer%27s_disease_brain_comparison.jpg/1024px-Alzheimer%27s_disease_brain_comparison.jpg" alt="Healthy Brain vs Alzheimer's Brain" class="w-full rounded">
+                        <p class="text-sm text-gray-500 mt-2 text-center">Comparison of a healthy brain (left) and a brain affected by Alzheimer's disease (right)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Statistics -->
+        <section id="slide-3" class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl font-bold mb-6">Alzheimer's Disease: <span class="buckeye-accent">By the Numbers</span></h2>
+                <p class="mb-6">Alzheimer's disease is a growing public health crisis affecting millions of Americans and their families:</p>
+                
+                <div class="stat-box">
+                    <h3 class="text-xl font-semibold mb-2">Prevalence</h3>
+                    <p class="text-lg">An estimated <strong>6.9 million Americans</strong> age 65 and older are living with Alzheimer's in 2024. This number could grow to <strong>13.8 million by 2060</strong> without medical breakthroughs.</p>
+                </div>
+                
+                <div class="stat-box">
+                    <h3 class="text-xl font-semibold mb-2">Demographics</h3>
+                    <p class="text-lg"><strong>1 in 9 people</strong> age 65 and older (10.9%) has Alzheimer's. Almost <strong>two-thirds of Americans</strong> with Alzheimer's are women, and older Black Americans are about twice as likely to have Alzheimer's as older White Americans.</p>
+                </div>
+                
+                <div class="stat-box">
+                    <h3 class="text-xl font-semibold mb-2">Impact</h3>
+                    <p class="text-lg">Alzheimer's is the <strong>6th leading cause of death</strong> in the United States. In 2023, Alzheimer's and other dementias cost the nation <strong>$345 billion</strong>, with this number expected to rise to nearly <strong>$1 trillion by 2050</strong>.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Brain Changes -->
+        <section id="slide-4" class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl font-bold mb-6">Brain Changes in <span class="buckeye-accent">Alzheimer's Disease</span></h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="mb-4">Alzheimer's disease is characterized by specific changes in the brain:</p>
+                        
+                        <div class="list-item">
+                            <strong>Amyloid plaques:</strong> Abnormal clusters of protein fragments that build up between nerve cells
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Neurofibrillary tangles:</strong> Abnormal collections of the protein tau that accumulate inside neurons
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Loss of connections:</strong> Damage to neuronal connections and communication between networks of neurons
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Inflammation:</strong> Activation of immune system cells (microglia) in response to brain damage
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Brain atrophy:</strong> Widespread brain cell death leading to significant tissue shrinkage
+                        </div>
+                    </div>
+                    
+                    <div class="image-container">
+                        <img src="https://www.researchgate.net/publication/5261932/figure/fig1/AS:667199782019089@1536084232721/The-Healthy-Brain-left-and-the-Alzheimers-Brain-right.png" alt="Brain Changes in Alzheimer's" class="w-full rounded">
+                        <p class="text-sm text-gray-500 mt-2 text-center">The changes begin years before symptoms appear, with damage initially occurring in regions involved in memory formation</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Symptoms and Progression -->
+        <section id="slide-5" class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl font-bold mb-6">Symptoms and <span class="buckeye-accent">Disease Progression</span></h2>
+                <p class="mb-8">Alzheimer's typically progresses slowly through three general stages: early, middle and late stage. The symptoms become more severe over time:</p>
+                
+                <div class="stages-container">
+                    <div class="stage">
+                        <h3 class="text-xl font-semibold mb-3 buckeye-accent">Early Stage</h3>
+                        <ul class="space-y-2">
+                            <li>Memory lapses (recent conversations, events)</li>
+                            <li>Difficulty finding the right word</li>
+                            <li>Trouble organizing or planning</li>
+                            <li>Getting lost in familiar places</li>
+                            <li>Making poor judgments</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="stage">
+                        <h3 class="text-xl font-semibold mb-3 buckeye-accent">Middle Stage</h3>
+                        <ul class="space-y-2">
+                            <li>Increasing memory loss and confusion</li>
+                            <li>Difficulty recognizing family and friends</li>
+                            <li>Inability to learn new things</li>
+                            <li>Problems with language and reading</li>
+                            <li>Hallucinations and paranoia</li>
+                            <li>Impulsive behavior</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="stage">
+                        <h3 class="text-xl font-semibold mb-3 buckeye-accent">Late Stage</h3>
+                        <ul class="space-y-2">
+                            <li>Inability to communicate</li>
+                            <li>Complete dependence on caregivers</li>
+                            <li>Loss of physical abilities (walking, sitting)</li>
+                            <li>Difficulty swallowing</li>
+                            <li>Loss of awareness of surroundings</li>
+                            <li>Vulnerability to infections</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Risk Factors -->
+        <section id="slide-6" class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl font-bold mb-6">Risk <span class="buckeye-accent">Factors</span></h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4">Non-modifiable Risk Factors</h3>
+                        
+                        <div class="list-item">
+                            <strong>Age:</strong> The greatest known risk factor; most people with Alzheimer's are 65 and older
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Family history:</strong> Having a first-degree relative with Alzheimer's increases risk
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Genetics:</strong> Specific genes (APOE-e4) increase risk
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Down syndrome:</strong> Many people with Down syndrome develop Alzheimer's as they age
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4">Modifiable Risk Factors</h3>
+                        
+                        <div class="list-item">
+                            <strong>Cardiovascular health:</strong> Heart disease, high blood pressure, high cholesterol
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Diabetes:</strong> Type 2 diabetes may increase risk
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Head injuries:</strong> Severe or repeated traumatic brain injuries
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Lifestyle factors:</strong> Poor diet, lack of exercise, smoking, excessive alcohol use
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Education level:</strong> Lower levels of education are associated with increased risk
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Diagnosis -->
+        <section id="slide-7" class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl font-bold mb-6">Diagnosing <span class="buckeye-accent">Alzheimer's Disease</span></h2>
+                
+                <p class="mb-6">There is no single test that can definitively diagnose Alzheimer's disease. Diagnosis typically involves:</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <div class="list-item">
+                            <strong>Medical history:</strong> Detailed review of symptoms, previous medical issues, and family history
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Cognitive tests:</strong> Mental status testing to evaluate memory, problem-solving, attention, and language
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Physical examination:</strong> To rule out other conditions that may cause similar symptoms
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Neurological exams:</strong> Evaluating reflexes, muscle tone, speech, and coordination
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Brain imaging:</strong> MRI, CT, or PET scans to identify structural changes or rule out other conditions
+                        </div>
+                    </div>
+                    
+                    <div class="image-container">
+                        <img src="https://media.sciencephoto.com/f0/31/82/71/f0318271-400px-wm.jpg" alt="Brain Imaging in Alzheimer's Diagnosis" class="w-full rounded">
+                        <p class="text-sm text-gray-500 mt-2 text-center">PET scans can detect amyloid plaques and tau tangles in the brain, which are hallmarks of Alzheimer's disease</p>
+                        
+                        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                            <h4 class="font-semibold mb-2">Emerging Diagnostic Tools</h4>
+                            <p>Blood tests that can detect biomarkers of Alzheimer's disease are being developed, which may enable earlier and less invasive diagnosis in the future.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Current Treatments -->
+        <section id="slide-8" class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl font-bold mb-6">Current <span class="buckeye-accent">Treatments</span></h2>
+                
+                <p class="mb-6">While there's no cure for Alzheimer's disease, several medications and non-drug approaches can help manage symptoms:</p>
+                
+                <div class="treatment-box">
+                    <h3 class="text-xl font-semibold mb-2">Medications for Cognitive Symptoms</h3>
+                    <ul class="space-y-2 ml-6 list-disc">
+                        <li><strong>Cholinesterase inhibitors</strong> (Donepezil, Rivastigmine, Galantamine): Help preserve a chemical messenger involved in memory and thinking</li>
+                        <li><strong>Memantine:</strong> Regulates glutamate, another brain chemical involved in learning and memory</li>
+                        <li><strong>Combination therapy:</strong> Some patients benefit from combining memantine with a cholinesterase inhibitor</li>
+                    </ul>
+                </div>
+                
+                <div class="treatment-box">
+                    <h3 class="text-xl font-semibold mb-2">Disease-Modifying Treatments</h3>
+                    <ul class="space-y-2 ml-6 list-disc">
+                        <li><strong>Lecanemab (Leqembi):</strong> FDA-approved immunotherapy drug targeting beta-amyloid for early Alzheimer's</li>
+                        <li><strong>Donanemab (Kisunla):</strong> FDA-approved for patients with mild cognitive impairment or mild dementia due to Alzheimer's</li>
+                    </ul>
+                </div>
+                
+                <div class="treatment-box">
+                    <h3 class="text-xl font-semibold mb-2">Non-Drug Approaches</h3>
+                    <ul class="space-y-2 ml-6 list-disc">
+                        <li><strong>Cognitive stimulation:</strong> Activities to maintain mental function</li>
+                        <li><strong>Environmental modifications:</strong> Creating a safe, structured environment</li>
+                        <li><strong>Behavioral strategies:</strong> Techniques to manage challenging behaviors</li>
+                        <li><strong>Physical activity:</strong> Regular exercise can help maintain physical function</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: Emerging Treatments -->
+        <section id="slide-9" class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl font-bold mb-6">Emerging <span class="buckeye-accent">Treatments & Research</span></h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="mb-4">Research into new Alzheimer's treatments is targeting several approaches:</p>
+                        
+                        <div class="list-item">
+                            <strong>Anti-amyloid therapies:</strong> Additional antibodies that target and clear amyloid plaques
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Anti-tau approaches:</strong> Treatments to prevent the formation of tau tangles
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Anti-inflammatory drugs:</strong> Reducing the brain inflammation associated with Alzheimer's
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Neuroprotection:</strong> Protecting brain cells from damage and death
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Gene therapy:</strong> Addressing genetic risk factors for Alzheimer's
+                        </div>
+                        
+                        <div class="list-item">
+                            <strong>Stem cell therapy:</strong> Potential to replace damaged brain cells
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                            <h3 class="text-xl font-semibold mb-3">Current Clinical Trials</h3>
+                            <p>Hundreds of clinical trials are currently investigating potential Alzheimer's treatments at various phases of development.</p>
+                            <p class="mt-2">These include therapies targeting multiple aspects of the disease, from amyloid and tau to inflammation, metabolic dysfunction, and neuronal protection.</p>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-6 rounded-lg">
+                            <h3 class="text-xl font-semibold mb-3">Ohio State's Contributions</h3>
+                            <p>The Ohio State University is actively involved in Alzheimer's research, including:</p>
+                            <ul class="mt-2 space-y-1 ml-6 list-disc">
+                                <li>Development of new research databases</li>
+                                <li>Clinical trials of new treatments</li>
+                                <li>Investigation of neurostimulation approaches</li>
+                                <li>Study of lifestyle interventions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 10: Prevention Strategies -->
+        <section id="slide-10" class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl font-bold mb-6">Prevention <span class="buckeye-accent">Strategies</span></h2>
+                
+                <p class="mb-6">While there's no proven way to prevent Alzheimer's disease, research suggests several strategies may help reduce risk:</p>
+                
+                <div class="prevention-item">
+                    <div class="prevention-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-1">Cardiovascular Health</h3>
+                        <p>Manage blood pressure, cholesterol, and diabetes; avoid smoking; maintain a healthy weight</p>
+                    </div>
+                </div>
+                
+                <div class="prevention-item">
+                    <div class="prevention-icon">
+                        <i class="fas fa-apple-alt"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-1">Healthy Diet</h3>
+                        <p>Mediterranean or MIND diet rich in fruits, vegetables, whole grains, fish, and olive oil; low in red meat and processed foods</p>
+                    </div>
+                </div>
+                
+                <div class="prevention-item">
+                    <div class="prevention-icon">
+                        <i class="fas fa-running"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-1">Physical Activity</h3>
+                        <p>Regular exercise may directly benefit brain cells by increasing blood and oxygen flow to the brain</p>
+                    </div>
+                </div>
+                
+                <div class="prevention-item">
+                    <div class="prevention-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-1">Cognitive Stimulation</h3>
+                        <p>Mentally stimulating activities, education, and learning new skills may build cognitive reserve</p>
+                    </div>
+                </div>
+                
+                <div class="prevention-item">
+                    <div class="prevention-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-1">Social Engagement</h3>
+                        <p>Maintaining social connections and participating in social activities may support brain health</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11: Impact on Caregivers -->
+        <section id="slide-11" class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl font-bold mb-6">Impact on <span class="buckeye-accent">Caregivers</span></h2>
+                
+                <p class="mb-4">Alzheimer's disease affects not only those with the condition but also their caregivers and families:</p>
+                
+                <div class="caregiver-impact">
+                    <div class="impact-item">
+                        <h3 class="text-xl font-semibold mb-2">Emotional Burden</h3>
+                        <p>59% of dementia caregivers report high to very high emotional stress, with 30-40% experiencing depression</p>
+                    </div>
+                    
+                    <div class="impact-item">
+                        <h3 class="text-xl font-semibold mb-2">Financial Impact</h3>
+                        <p>Caregivers spend an average of $12,388 annually in out-of-pocket costs related to caregiving</p>
+                    </div>
+                    
+                    <div class="impact-item">
+                        <h3 class="text-xl font-semibold mb-2">Time Commitment</h3>
+                        <p>In 2023, 11.5 million family caregivers provided an estimated 18.4 billion hours of unpaid care</p>
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <h3 class="text-xl font-semibold mb-4">Supporting Caregivers</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-50 p-4 rounded">
+                            <h4 class="font-semibold mb-2">Education and Training</h4>
+                            <p>Understanding Alzheimer's progression and learning care techniques can reduce stress and improve care quality</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded">
+                            <h4 class="font-semibold mb-2">Support Groups</h4>
+                            <p>Connecting with others in similar situations provides emotional support and practical advice</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded">
+                            <h4 class="font-semibold mb-2">Respite Care</h4>
+                            <p>Short-term relief for caregivers helps prevent burnout and maintains caregiver health</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded">
+                            <h4 class="font-semibold mb-2">Self-Care Practices</h4>
+                            <p>Encouraging caregivers to maintain their own health and well-being is essential</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12: Buckeyes Against Alzheimer's Mission -->
+        <section id="slide-12" class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl font-bold mb-6">Our <span class="buckeye-accent">Mission</span></h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <div class="mission-statement">
+                            <p class="text-lg">Our goal is not only to spread awareness of this disease, but also to contribute to the fight against Alzheimer's Disease. As a strong community, we wish to understand, combat, and overcome this disease through service, innovation, and creativity.</p>
+                        </div>
+                        
+                        <p class="mt-8">Founded in Spring Semester 2015, Buckeyes Against Alzheimer's is an undergraduate organization at The Ohio State University devoted to:</p>
+                        
+                        <ul class="mt-4 space-y-3">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-red-700 mt-1 mr-2"></i>
+                                <span>Promoting awareness about Alzheimer's disease and its prevention</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-red-700 mt-1 mr-2"></i>
+                                <span>Educating our community about the impacts of Alzheimer's</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-red-700 mt-1 mr-2"></i>
+                                <span>Serving those affected by Alzheimer's through regular volunteering</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-red-700 mt-1 mr-2"></i>
+                                <span>Supporting research efforts to find treatments and a cure</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <img src="https://org.osu.edu/baainfo/files/2021/07/BAA-e1627177512436-300x124.jpg" alt="Buckeyes Against Alzheimer's Logo" class="mx-auto mb-6">
+                        
+                        <div class="bg-gray-50 p-6 rounded-lg">
+                            <h3 class="text-xl font-semibold mb-3">Our Activities</h3>
+                            <ul class="space-y-2">
+                                <li>Weekly volunteering at local care facilities</li>
+                                <li>Educational seminars and presentations</li>
+                                <li>Hosting speakers and experts in the field</li>
+                                <li>Awareness events and fundraising campaigns</li>
+                                <li>Bi-weekly club meetings to develop initiatives</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 13: How to Help -->
+        <section id="slide-13" class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl font-bold mb-6">How You Can <span class="buckeye-accent">Help</span></h2>
+                
+                <p class="mb-8">Join the Buckeyes Against Alzheimer's mission to fight this disease and support those affected:</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gray-50 p-6 rounded-lg text-center">
+                        <div class="text-4xl text-red-700 mb-4">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Become a Member</h3>
+                        <p>Join our club to participate in volunteering, educational events, and awareness initiatives</p>
+                        <div class="mt-4 text-sm">
+                            <p><strong>Requirements:</strong></p>
+                            <p>Attend 6+ general meetings per semester</p>
+                            <p>Participate in volunteer activities or major events</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-6 rounded-lg text-center">
+                        <div class="text-4xl text-red-700 mb-4">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Volunteer</h3>
+                        <p>Participate in our volunteering sessions at local memory care and assisted living facilities</p>
+                        <div class="mt-4 text-sm">
+                            <p>Help with activities for residents</p>
+                            <p>Provide companionship to those with Alzheimer's</p>
+                            <p>Support caregivers and staff</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-6 rounded-lg text-center">
+                        <div class="text-4xl text-red-700 mb-4">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Spread Awareness</h3>
+                        <p>Help educate others about Alzheimer's disease and its impact</p>
+                        <div class="mt-4 text-sm">
+                            <p>Share information on social media</p>
+                            <p>Participate in awareness campaigns</p>
+                            <p>Talk to friends and family about brain health</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 p-6 bg-red-50 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-3 text-center">Get in Touch</h3>
+                    <div class="flex flex-wrap justify-center gap-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-envelope text-red-700 mr-2"></i>
+                            <span>Email: buckeyesagainstalzheimers@osu.edu</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fab fa-instagram text-red-700 mr-2"></i>
+                            <span>Instagram: @baa.osu</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fab fa-facebook text-red-700 mr-2"></i>
+                            <span>Facebook: BucksAgainstAlzheimers</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 14: Resources -->
+        <section id="slide-14" class="slide">
+            <div class="slide-content">
+                <h2 class="text-3xl font-bold mb-6">Helpful <span class="buckeye-accent">Resources</span></h2>
+                
+                <p class="mb-6">These organizations provide valuable information and support for those affected by Alzheimer's disease:</p>
+                
+                <div class="resource-card">
+                    <h3 class="text-xl font-semibold mb-2">Alzheimer's Association</h3>
+                    <p class="mb-2">The leading voluntary health organization in Alzheimer's care, support, and research.</p>
+                    <p><strong>24/7 Helpline:</strong> 800-272-3900</p>
+                    <p><strong>Website:</strong> <a href="https://www.alz.org" class="text-blue-600 hover:underline" target="_blank">www.alz.org</a></p>
+                </div>
+                
+                <div class="resource-card">
+                    <h3 class="text-xl font-semibold mb-2">Ohio State University Memory Disorders Clinic</h3>
+                    <p class="mb-2">Provides diagnosis and treatment for patients with memory disorders, including Alzheimer's disease.</p>
+                    <p><strong>Phone:</strong> 614-293-4969</p>
+                    <p><strong>Website:</strong> <a href="https://wexnermedical.osu.edu/brain-spine-neuro/memory-disorders" class="text-blue-600 hover:underline" target="_blank">wexnermedical.osu.edu/brain-spine-neuro/memory-disorders</a></p>
+                </div>
+                
+                <div class="resource-card">
+                    <h3 class="text-xl font-semibold mb-2">National Institute on Aging - Alzheimer's Disease Education and Referral Center</h3>
+                    <p class="mb-2">Provides information about Alzheimer's disease and related dementias for health professionals, patients, and families.</p>
+                    <p><strong>Phone:</strong> 800-438-4380</p>
+                    <p><strong>Website:</strong> <a href="https://www.nia.nih.gov/health/alzheimers" class="text-blue-600 hover:underline" target="_blank">www.nia.nih.gov/health/alzheimers</a></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 15: Thank You -->
+        <section id="slide-15" class="slide">
+            <div class="slide-content text-center">
+                <h2 class="text-4xl font-bold mb-8">Thank <span class="buckeye-accent">You</span></h2>
+                
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Ohio_State_Buckeyes_logo.svg/2082px-Ohio_State_Buckeyes_logo.svg.png" alt="OSU Buckeyes Logo" class="h-24 mx-auto mb-8">
+                
+                <p class="text-xl mb-10">Together, we can make a difference in the fight against Alzheimer's disease.</p>
+                
+                <div class="p-6 bg-gray-50 rounded-lg inline-block mx-auto">
+                    <h3 class="text-xl font-semibold mb-3">Buckeyes Against Alzheimer's</h3>
+                    <p>The Ohio State University</p>
+                    <p class="mt-2">
+                        <a href="https://activities.osu.edu/involvement/student_organizations/find_a_student_org/?i=5245" class="text-blue-600 hover:underline" target="_blank">Learn more about our organization</a>
+                    </p>
+                </div>
+                
+                <div class="mt-10">
+                    <p class="text-gray-500">Contact: buckeyesagainstalzheimers@osu.edu</p>
+                    <p class="text-gray-400 mt-2">© 2025 Buckeyes Against Alzheimer's</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="control-panel">
+        <button id="prev-btn" class="btn">
+            <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <button id="present-btn" class="btn present-btn">
+            <i class="fas fa-play"></i> Present
+        </button>
+        <button id="next-btn" class="btn">
+            Next <i class="fas fa-arrow-right"></i>
+        </button>
+        <button id="pdf-btn" class="btn">
+            <i class="fas fa-file-pdf"></i> PDF View
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const presentBtn = document.getElementById('present-btn');
+            const pdfBtn = document.getElementById('pdf-btn');
+            const container = document.getElementById('presentation-container');
+            
+            let currentSlide = 0;
+            let isPresenting = false;
+            let presentationInterval;
+            
+            function showSlide(index) {
+                slides.forEach(slide => {
+                    slide.classList.remove('active');
+                });
+                
+                if (index < 0) {
+                    currentSlide = slides.length - 1;
+                } else if (index >= slides.length) {
+                    currentSlide = 0;
+                } else {
+                    currentSlide = index;
+                }
+                
+                slides[currentSlide].classList.add('active');
+                slides[currentSlide].scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            function nextSlide() {
+                showSlide(currentSlide + 1);
+            }
+            
+            function prevSlide() {
+                showSlide(currentSlide - 1);
+            }
+            
+            function togglePresentation() {
+                isPresenting = !isPresenting;
+                
+                if (isPresenting) {
+                    document.body.classList.add('present-mode');
+                    presentBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                    presentationInterval = setInterval(nextSlide, 10000); // Change slide every 10 seconds
+                } else {
+                    document.body.classList.remove('present-mode');
+                    presentBtn.innerHTML = '<i class="fas fa-play"></i> Present';
+                    clearInterval(presentationInterval);
+                }
+            }
+            
+            function togglePdfView() {
+                document.body.classList.toggle('pdf-display');
+                if (document.body.classList.contains('pdf-display')) {
+                    pdfBtn.innerHTML = '<i class="fas fa-desktop"></i> Slide View';
+                    slides.forEach(slide => {
+                        slide.classList.add('active');
+                    });
+                } else {
+                    pdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> PDF View';
+                    slides.forEach((slide, index) => {
+                        if (index !== currentSlide) {
+                            slide.classList.remove('active');
+                        }
+                    });
+                }
+            }
+            
+            prevBtn.addEventListener('click', function() {
+                if (isPresenting) {
+                    togglePresentation();
+                }
+                prevSlide();
+            });
+            
+            nextBtn.addEventListener('click', function() {
+                if (isPresenting) {
+                    togglePresentation();
+                }
+                nextSlide();
+            });
+            
+            presentBtn.addEventListener('click', togglePresentation);
+            pdfBtn.addEventListener('click', togglePdfView);
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowRight' || e.key === 'Space') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                } else if (e.key === 'p' || e.key === 'P') {
+                    togglePresentation();
+                }
+            });
+            
+            // Initialize with the first slide
+            showSlide(0);
+            
+            // Animate in elements when they enter the viewport
+            const animateElements = function() {
+                const slideContents = document.querySelectorAll('.slide.active .list-item, .slide.active .stat-box, .slide.active .image-container, .slide.active .stage, .slide.active .treatment-box, .slide.active .mission-statement, .slide.active .prevention-item, .slide.active .resource-card, .slide.active .impact-item');
+                
+                slideContents.forEach(element => {
+                    const position = element.getBoundingClientRect();
+                    
+                    // Check if element is in viewport
+                    if (position.top >= 0 && position.bottom <= window.innerHeight) {
+                        element.style.opacity = '1';
+                        element.style.transform = 'translateY(0)';
+                    }
+                });
+            };
+            
+            // Call once to set up initial animations
+            setTimeout(animateElements, 100);
+            
+            // Set up animations when changing slides
+            slides.forEach(slide => {
+                slide.addEventListener('transitionend', animateElements);
+            });
+        });
+    </script>
+</body>
+</html>
